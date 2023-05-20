@@ -1,0 +1,51 @@
+﻿@page "/book/delete/{bookId:int}"
+@using BlazorWebCRUD.Shared.Models
+@inject HttpClient Http
+@inject NavigationManager NavigationManager
+<h2>Delete Book</h2>
+<br />
+<div class="form-group">
+    <h4>Do you want to delete this book?</h4>
+    <table class="table">
+        <tbody>
+            <tr>
+                <td>Title</td>
+                <td>@book.Title</td>
+            </tr>
+            <tr>
+                <td>Author</td>
+                <td>@book.Author</td>
+            </tr>
+            <tr>
+                <td>Published Year</td>
+                <td>@book.PublishedYear</td>
+            </tr>
+            <tr>
+                <td>Description</td>
+                <td>@book.Description</td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+<div class="form-group">
+    <input type="submit" value="Delete" @onclick="(async () => await RemoveUser(book.Id))" class="btn btn-danger" />
+    <input type="submit" value="Cancel" @onclick="(() => Cancel())" class="btn btn-warning" />
+</div>
+@code {
+    [Parameter]
+    public int bookId { get; set; }
+    Book book = new Book();
+    protected override async Task OnInitializedAsync()
+    {
+        book = await Http.GetFromJsonAsync<Book>("/api/book/" + Convert.ToInt32(bookId));
+    }
+    protected async Task RemoveUser(int bookId)
+    {
+        await Http.DeleteAsync("api/book/" + bookId);
+        NavigationManager.NavigateTo("/fetchbookdetails");
+    }
+    void Cancel()
+    {
+        NavigationManager.NavigateTo("/fetchbookdetails");
+    }
+}
